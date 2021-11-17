@@ -9,7 +9,7 @@ if(!defined('IN_DISCUZ')) {
 
 include_once DISCUZ_ROOT . './source/plugin/zhaisoul_dzq_api/tools.class.php';
 
-$emoji_list = memory('get', 'emoji_api');
+$emoji_list = memory('get', 'dzq_emoji_api');
 
 if(!is_array($emoji_list) || empty($emoji_list)) {
     foreach (C::t('forum_imagetype')->fetch_all_by_type('smiley', 1) as $type) {
