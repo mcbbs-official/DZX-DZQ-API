@@ -21,3 +21,13 @@ Discuz! Q: 3.0.21111
 进入dzx的管理面板安装该插件
 修改nginx配置
 请享用！
+
+# 配置
+## nginx
+在dzx的nginx配置中，加入如下location即可
+
+```nginx
+location /api/v3 {
+  rewrite ^\/api\/v3\/(.+) /plugin.php?id=zhaisoul_dzq_api:api&module=$1&$args;
+}
+```
