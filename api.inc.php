@@ -36,7 +36,8 @@ if($Token) {
 $need_token_module = array(
     'thread.create',
     'post.create',
-    'post.update'
+    'post.update',
+    'unreadnotification'
 );
 $origin_path = explode('/', $_GET['module']);
 $origin_module = count($origin_path) != 1 ? explode('.', trim($origin_path[1])) : explode('.', trim($_GET['module']));
