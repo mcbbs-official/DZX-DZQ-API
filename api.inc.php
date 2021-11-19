@@ -27,7 +27,7 @@ if($Token) {
         $member = getuserbyuid($payload['sub'], 1);
         setloginstatus($member, 300);
         $is_login = true;
-    } else {
+    } else if(!in_array($_GET['module'], array('users/username.login', 'forum', 'emoji', 'thread.list', 'thread.stick', 'categories'))) {
         Utils::outPut(-4011, "无效的Token");
     }
 }
@@ -38,16 +38,19 @@ $need_token_module = array(
     'post.create',
     'post.update'
 );
-
-$origin_module = explode('.', trim($_GET['module']));
+$origin_path = explode('/', $_GET['module']);
+$origin_module = count($origin_path) != 1 ? explode('.', trim($origin_path[1])) : explode('.', trim($_GET['module']));
 $module = $origin_module[0];
 $ac = !empty($origin_module[1]) ? $origin_module[1] : 'index';
 
-if(!in_array($origin_module, $need_token_module) && !$is_login) {
+if(in_array($origin_module, $need_token_module) && !$is_login) {
     Utils::outPut(-3001, "需要登录后使用");
 }
-
-$file = DISCUZ_ROOT.'./source/plugin/zhaisoul_dzq_api/module/'.$module.'/'.$ac.'.inc.php';
+if(count($origin_path) == 1) {
+    $file = DISCUZ_ROOT . './source/plugin/zhaisoul_dzq_api/module/' . $module . '/' . $ac . '.inc.php';
+} else {
+    $file = DISCUZ_ROOT . './source/plugin/zhaisoul_dzq_api/module/'. $origin_path[0] . '/' . $module . '/' . $ac . '.inc.php';
+}
 
 if(file_exists($file)){
     try {

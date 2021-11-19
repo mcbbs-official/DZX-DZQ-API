@@ -8,6 +8,12 @@ class Utils {
     private static $prikey = '';
 
     private static $pubkey = '';
+
+    private static $header = array(
+        'alg'=>'HS256', //生成signature的算法
+        'typ'=>'JWT'    //类型
+    );
+
     /**
      * @var mixed
      */
@@ -22,10 +28,22 @@ class Utils {
             "RequestId" => empty($requestId) ? Utils::create_uuid() : $requestId,
             'RequestTime' => empty($requestTime) ? date('Y-m-d H:i:s') : $requestTime
         ];
-        header('content-type:application/json;charset=utf-8');
+        header('content-type:application/json; charset=utf-8');
+        // 去掉设置cookie
+        header_remove('set-cookie');
+        header('access-control-expose-headers: Authorization, authenticated');
+        header('access-control-allow-credentials: true');
+        header('access-control-allow-methods: GET, POST, PATCH, PUT, OPTIONS, DELETE');
+        header('access-control-allow-headers: Origin, Content-Type, Cookie, X-CSRF-TOKEN, Accept, Authorization, X-XSRF-TOKEN');
+        header('access-control-allow-origin: '.$_G['cache']['plugin']['zhaisoul_dzq_api']['dzq_url']);
+        header('x-content-type-options: nosniff');
+        header('x-frame-options: SAMEORIGIN');
+        header('x-xss-protection: 1; mode=block');
+
         if($code != 0) {
             http_response_code(503);
         }
+
         exit(json_encode($arr));
     }
 
@@ -53,7 +71,7 @@ class Utils {
             return false;
         }
 
-        if (!self::signature($base64header.'.'.$base64payload, self::base64UrlDecode($sign))) {
+        if (!self::verify($base64header.'.'.$base64payload, self::base64UrlDecode($sign))) {
             return false;
         }
 
@@ -76,8 +94,7 @@ class Utils {
         return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
     }
 
-    private static function signature($input, $sign)
-    {
+    private static function verify($input, $sign) {
         global $_G;
         self::$prikey = $_G['cache']['plugin']['zhaisoul_dzq_api']['pri_key'];
         self::$pubkey = $_G['cache']['plugin']['zhaisoul_dzq_api']['pub_key'];
@@ -92,5 +109,22 @@ class Utils {
             $err[] = $msg;
 
         return $pass;
+    }
+
+    private static function signature($input, $key, $alg = 'HS256') {
+        $key = str_replace("\r\n", "\n", $key);
+        $token = '';
+        openssl_sign($input, $token, $key, OPENSSL_ALGO_SHA256);
+        return self::base64UrlEncode($token);
+    }
+
+    public static function getToken($payload) {
+        global $_G;
+        self::$prikey = $_G['cache']['plugin']['zhaisoul_dzq_api']['pri_key'];
+        self::$pubkey = $_G['cache']['plugin']['zhaisoul_dzq_api']['pub_key'];
+
+        $base64header = self::base64UrlEncode(json_encode(self::$header));
+        $base64payload = self::base64UrlEncode(json_encode($payload));
+        return $base64header . '.' . $base64payload . '.' . self::signature($base64header . '.' . $base64payload, self::$prikey, self::$header['alg']);
     }
 }

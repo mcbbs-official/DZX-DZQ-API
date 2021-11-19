@@ -93,6 +93,35 @@ class plugin_zhaisoul_dzq_api {
             );
 
             Utils::outPut(0, '接口请求成功', $arr);
+        } else if(in_array($param['param'][0], array('login_question_empty', 'login_invalid', 'login_question_invalid', 'login_password_invalid'))) {
+            Utils::outPut(-7040, '登录失败: '.$param['param'][0]);
+        } else if(in_array($param['param'][0], array('login_succeed', 'location_login_succeed_mobile', 'location_login_succeed', 'login_succeed_inactive_member', 'login_succeed_password_change'))) {
+            $payload = array(
+                'aud' => '',
+                'jti' => md5(uniqid('JWT').time()),
+                'iat' => TIMESTAMP,
+                'nbf' => TIMESTAMP,
+                'exp' => TIMESTAMP + 2592000,
+                'sub' => $_G['uid'],
+                'scopes' => array(
+                    0 => null
+                )
+            );
+            $token = Utils::getToken($payload);
+
+            $arr = array(
+                'tokenType' => 'Bearer',
+                'expiresIn' => 2592000,
+                'accessToken' => $token,
+                'refreshToken' => '',
+                'isMissNickname' => 0,
+                'avatarUrl' => avatar($_G['uid'], 'middle', true),
+                'userStatus' => 0,
+                'userId' => $_G['uid'],
+                'uid' => $_G['uid']
+            );
+
+            Utils::outPut(0, '登录成功', $arr);
         } else {
             Utils::outPut(-5003, '接口错误: '.$param['param'][0]);
         }
@@ -100,6 +129,10 @@ class plugin_zhaisoul_dzq_api {
 }
 
 class plugin_zhaisoul_dzq_api_forum extends plugin_zhaisoul_dzq_api {
+
+}
+
+class plugin_zhaisoul_dzq_api_member extends plugin_zhaisoul_dzq_api {
 
 }
 
@@ -117,6 +150,9 @@ class mobileplugin_zhaisoul_dzq_api_forum extends mobileplugin_zhaisoul_dzq_api 
 
 }
 
+class mobileplugin_zhaisoul_dzq_api_member extends mobileplugin_zhaisoul_dzq_api {
+
+}
 
 class mobileplugin_zhaisoul_dzq_api_plugin extends mobileplugin_zhaisoul_dzq_api_forum {
 
