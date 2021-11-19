@@ -5,9 +5,9 @@ if (!defined('IN_DISCUZ')) {
 }
 
 include_once DISCUZ_ROOT . './source/plugin/zhaisoul_dzq_api/tools.class.php';
-$uid = intval($_GET['userId']) ?? $_G['uid'];
+$uid = $_GET['userId'] ?? $_G['uid'];
 
-$user = getuserbyuid($uid);
+$user = getuserbyuid(intval($uid));
 $user = array_merge($user, C::t('common_member_profile')->fetch($uid), C::t('common_member_field_forum')->fetch($uid), C::t('common_member_status')->fetch($uid));
 
 if(empty($user)) {
