@@ -18,6 +18,19 @@ Discuz! Q: 3.0.21111
 
 # 安装
 将git文件丢到dzx的source/plugin/zhaisoul_dzq_api下（必须是这个目录！不要老想着自己改名字，弄个大新闻）
-进入dzx的管理面板安装该插件
-修改nginx配置
+
+进入dzx的管理面板安装该插件并配置JWT公钥私钥（可从DZQ的storage/cert目录下获取，publickey为公钥，privatekey为私钥）
+
+修改nginx配置，添加location
+
 请享用！
+
+# 配置
+## nginx
+在dzx的nginx配置中，加入如下location即可
+
+```nginx
+location /api/v3 {
+  rewrite ^\/api\/v3\/(.+) /plugin.php?id=zhaisoul_dzq_api:api&module=$1&$args;
+}
+```
