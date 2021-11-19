@@ -45,7 +45,7 @@ $arr = array(
         'usernameLoginIsdisplay' => true,
         'openApiLog' => '0',
         'openViewCount' => '0',
-        'version' => 'dzq_api_v1.1'
+        'version' => 'dzx_to_dzq_api_v'.$_G['setting']['plugins']['version']['zhaisoul_dzq_api']
     ),
     'setReg' => array(
         'registerClose' => $_G['setting']['regstatus'] == 1 || $_G['setting']['regstatus'] == 3,
